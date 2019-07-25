@@ -102,6 +102,12 @@ ${HTML(fragment.foot_html())}
 
 </%block>
 
+%if banner_account_activation_message:
+  <div class="dashboard-banner">
+    ${banner_account_activation_message | n, decode.utf8}
+  </div>
+%endif
+
 <div class="message-banner" aria-live="polite"></div>
 
 % if default_tab:

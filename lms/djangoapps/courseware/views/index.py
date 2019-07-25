@@ -59,6 +59,8 @@ from .views import (
     get_cosmetic_verified_display_price
 )
 
+from .views import get_banner_account_activation_message
+
 log = logging.getLogger("edx.courseware.views.index")
 
 TEMPLATE_IMPORTS = {'urllib': urllib}
@@ -329,6 +331,12 @@ class CoursewareIndex(View):
         """
         course_url_name = default_course_url_name(self.course.id)
         course_url = reverse(course_url_name, kwargs={'course_id': unicode(self.course.id)})
+        
+        banner_account_activation_message = get_banner_account_activation_message(
+            'registration/activate_account_notice.html',
+            request.user,
+        )
+        
         courseware_context = {
             'csrf': csrf(self.request)['csrf_token'],
             'course': self.course,
@@ -352,6 +360,7 @@ class CoursewareIndex(View):
             # TODO: (Experimental Code). See https://openedx.atlassian.net/wiki/display/RET/2.+In-course+Verification+Prompts
             'upgrade_link': check_and_get_upgrade_link(request, self.effective_user, self.course.id),
             'upgrade_price': get_cosmetic_verified_display_price(self.course),
+            'banner_account_activation_message': banner_account_activation_message,
             # ENDTODO
         }
         table_of_contents = toc_for_course(

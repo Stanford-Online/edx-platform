@@ -22,6 +22,12 @@ from openedx.features.course_experience import SHOW_REVIEWS_TOOL_FLAG
 <%static:css group='style-course'/>
 </%block>
 
+%if banner_account_activation_message:
+  <div class="dashboard-banner">
+    ${banner_account_activation_message | n, decode.utf8}
+  </div>
+%endif
+
 % if show_enroll_banner:
 <div class="wrapper-msg urgency-low" id="failed-verification-banner">
   <div class="msg msg-reverify is-dismissable">
@@ -41,6 +47,8 @@ from openedx.features.course_experience import SHOW_REVIEWS_TOOL_FLAG
 % endif
 
 <%include file="/courseware/course_navigation.html" args="active_page='info'" />
+
+
 
 <%static:require_module_async module_name="js/courseware/toggle_element_visibility" class_name="ToggleElementVisibility">
         ToggleElementVisibility();

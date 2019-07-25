@@ -28,6 +28,12 @@
 </%block>
 % endif
 
+%if banner_account_activation_message:
+  <div class="dashboard-banner">
+    ${banner_account_activation_message | n, decode.utf8}
+  </div>
+%endif
+
 <%block name="pagetitle">${_("Courses")}</%block>
 
 <main id="main" aria-label="Content" tabindex="-1">

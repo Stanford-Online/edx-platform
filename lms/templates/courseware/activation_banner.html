@@ -1,0 +1,22 @@
+
+<%!
+from lms.djangoapps.courseware.views.views import get_banner_account_activation_message
+from student.models import UserProfile
+%>
+
+<div>
+          ## Add activation banner, if appropriate.
+<%
+banner_account_activation_message = get_banner_account_activation_message('registration/activate_account_notice.html', user)
+%>
+
+% if UserProfile.has_registered(user):
+  % if banner_account_activation_message:
+    <div class="dashboard-banner">
+        ${banner_account_activation_message | n, decode.utf8}
+    </div>
+  % endif
+% endif
+    
+</div>
+

@@ -181,12 +181,18 @@ def courses(request):
 
     programs_list = get_programs_with_type(include_hidden=False)
 
+    banner_account_activation_message = get_banner_account_activation_message(
+        'registration/activate_account_notice.html',
+        request.user,
+    )    
+
     return render_to_response(
         "courseware/courses.html",
         {
             'courses': courses_list,
             'course_discovery_meanings': course_discovery_meanings,
-            'programs_list': programs_list
+            'programs_list': programs_list,
+            'banner_account_activation_message': banner_account_activation_message,
         }
     )
 
@@ -354,6 +360,11 @@ def course_info(request, course_id):
         # Decide whether or not to show the reviews link in the course tools bar
         show_reviews_link = CourseReviewsModuleFragmentView.is_configured()
 
+        banner_account_activation_message = get_banner_account_activation_message(
+            'registration/activate_account_notice.html',
+            request.user,
+        )
+
         context = {
             'request': request,
             'masquerade_user': user,
@@ -374,6 +385,7 @@ def course_info(request, course_id):
             # TODO: (Experimental Code). See https://openedx.atlassian.net/wiki/display/RET/2.+In-course+Verification+Prompts
             'upgrade_link': check_and_get_upgrade_link(request, user, course.id),
             'upgrade_price': get_cosmetic_verified_display_price(course),
+            'banner_account_activation_message': banner_account_activation_message,
             # ENDTODO
         }
 
@@ -521,6 +533,11 @@ class CourseTabView(EdxFragmentView):
             # Disable student view button if user is staff and
             # course is not yet visible to students.
             supports_preview_menu = False
+            
+        banner_account_activation_message = get_banner_account_activation_message(
+                        'registration/activate_account_notice.html',
+            request.user,
+        )
         return {
             'course': course,
             'tab': tab,
@@ -536,6 +553,7 @@ class CourseTabView(EdxFragmentView):
             # ENDTODO
             # TODO: (Experimental Code). See https://openedx.atlassian.net/wiki/display/RET/3.+Planning+Prompts
             'display_planning_prompt': _should_display_planning_prompt(request, course),
+            'banner_account_activation_message': banner_account_activation_message,
             # ENDTODO
         }
 
@@ -818,6 +836,11 @@ def course_about(request, course_id):
         # Overview
         overview = CourseOverview.get_from_id(course.id)
 
+        banner_account_activation_message = get_banner_account_activation_message(
+            'registration/activate_account_notice.html',
+            request.user,
+        )
+
         # This local import is due to the circularity of lms and openedx references.
         # This may be resolved by using stevedore to allow web fragments to be used
         # as plugins, and to avoid the direct import.
@@ -857,6 +880,7 @@ def course_about(request, course_id):
             'sneakpeek_allowed': sneakpeek_allowed,
             'course_image_urls': overview.image_urls,
             'reviews_fragment_view': reviews_fragment_view,
+            'banner_account_activation_message': banner_account_activation_message, 
         }
 
         return render_to_response('courseware/course_about.html', context)
@@ -1987,3 +2011,19 @@ def check_access_to_course(request, course):
     # Redirect if the user must answer a survey before entering the course.
     if must_answer_survey(course, request.user):
         raise CourseAccessRedirect(reverse('course_survey', args=[unicode(course.id)]))
+
+
+def get_banner_account_activation_message(url, user):
+    """
+    Helper to generate the activation banner html.
+    """
+    if user.is_anonymous():
+        return None
+
+    banner_account_activation_message = None
+    if not user.is_active:
+        banner_account_activation_message = render_to_string(
+            url,
+            {'email': user.email}
+        )
+    return banner_account_activation_message
