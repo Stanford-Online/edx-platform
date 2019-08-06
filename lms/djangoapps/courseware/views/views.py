@@ -105,6 +105,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, course_home_url_name
 from openedx.features.course_experience.views.course_dates import CourseDatesFragmentView
 from openedx.features.enterprise_support.api import data_sharing_consent_required
+from openedx.stanford.lms.djangoapps.courseware.views.views import get_banner_account_activation_message
 from shoppingcart.utils import is_shopping_cart_enabled
 from student.models import CourseEnrollment, UserTestGroup
 from survey.utils import must_answer_survey
@@ -818,6 +819,10 @@ def course_about(request, course_id):
         # Overview
         overview = CourseOverview.get_from_id(course.id)
 
+        banner_account_activation_message = get_banner_account_activation_message(
+            request.user,
+        )
+
         # This local import is due to the circularity of lms and openedx references.
         # This may be resolved by using stevedore to allow web fragments to be used
         # as plugins, and to avoid the direct import.
@@ -857,6 +862,7 @@ def course_about(request, course_id):
             'sneakpeek_allowed': sneakpeek_allowed,
             'course_image_urls': overview.image_urls,
             'reviews_fragment_view': reviews_fragment_view,
+            'banner_account_activation_message': banner_account_activation_message,
         }
 
         return render_to_response('courseware/course_about.html', context)

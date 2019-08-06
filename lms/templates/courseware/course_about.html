@@ -122,6 +122,12 @@ from openedx.core.lib.courses import course_image_url
   <script src="${static.url('js/course_info.js')}"></script>
 </%block>
 
+%if banner_account_activation_message:
+  <div class="dashboard-banner">
+    ${banner_account_activation_message | n, decode.utf8}
+  </div>
+%endif
+
 <%block name="pagetitle">${course.display_name_with_default_escaped}</%block>
 
 <section class="course-info">
