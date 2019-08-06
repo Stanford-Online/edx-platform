@@ -105,6 +105,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, course_home_url_name
 from openedx.features.course_experience.views.course_dates import CourseDatesFragmentView
 from openedx.features.enterprise_support.api import data_sharing_consent_required
+from openedx.stanford.lms.djangoapps.courseware.views.views import get_banner_account_activation_message
 from shoppingcart.utils import is_shopping_cart_enabled
 from student.models import CourseEnrollment, UserTestGroup
 from survey.utils import must_answer_survey
@@ -127,6 +128,7 @@ from ..module_render import get_module_for_descriptor, get_module, get_module_by
 
 from ..entrance_exams import user_can_skip_entrance_exam
 from ..module_render import get_module, get_module_by_usage_id, get_module_for_descriptor
+
 
 log = logging.getLogger("edx.courseware")
 
@@ -2011,19 +2013,3 @@ def check_access_to_course(request, course):
     # Redirect if the user must answer a survey before entering the course.
     if must_answer_survey(course, request.user):
         raise CourseAccessRedirect(reverse('course_survey', args=[unicode(course.id)]))
-
-
-def get_banner_account_activation_message(url, user):
-    """
-    Helper to generate the activation banner html.
-    """
-    if user.is_anonymous():
-        return None
-
-    banner_account_activation_message = None
-    if not user.is_active:
-        banner_account_activation_message = render_to_string(
-            url,
-            {'email': user.email}
-        )
-    return banner_account_activation_message
